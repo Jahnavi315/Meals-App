@@ -1,34 +1,61 @@
 import 'package:flutter/material.dart';
+import 'package:meals_app/providers/favorities_provider.dart';
+//import 'package:meals_app/data/dummy_data.dart';
 import 'package:meals_app/screens/categories.dart';
+import 'package:meals_app/screens/filters.dart';
 import 'package:meals_app/screens/meals.dart';
-import 'package:meals_app/models/meal.dart';
+//import 'package:meals_app/models/meal.dart';
 import 'package:meals_app/widgets/main_drawer.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+//import 'package:meals_app/providers/meals_provider.dart';
+import 'package:meals_app/providers/filters_provider.dart';
 
-class TabsScreen extends StatefulWidget{
+class TabsScreen extends ConsumerStatefulWidget{
   const TabsScreen({super.key});
   @override
-  State<StatefulWidget> createState() {
+  ConsumerState<ConsumerStatefulWidget> createState() {
     return _TabsScreen();
   }
 }
 
-class _TabsScreen extends State<TabsScreen>{
-  final List<Meal> _favoriteMeals=[];
+class _TabsScreen extends ConsumerState<TabsScreen>{
+  //final List<Meal> _favoriteMeals=[];
+  //Map<Filter,bool> _selectedFilters = kInitialFilers;
   var _selectedPageIndex = 0;
   void _selectPage(int index){
     setState(() {
       _selectedPageIndex=index;
     });
   }
-  void _showSnackBar(String message){
+  void _setScreen(String screen) async{
+    Navigator.of(context).pop();
+    if(screen=='Filters'){     
+      //push can also return a future object, this is basically wt we returned in pop and can store here
+      //final result = await 
+      Navigator.of(context).push<Map<Filter,bool>>(MaterialPageRoute(
+        builder: (cxt)=>const FiltersScreen()
+      ));
+      /*setState(() {
+        _selectedFilters = result ?? kInitialFilers ;
+      });*/
+      
+    }else{
+      if(_selectedPageIndex==1){
+        setState(() {
+          _selectedPageIndex=0;
+        });
+      }
+    }
+  }
+  /*void _showSnackBar(String message){
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message)
       ),
     );
-  }
-  void _toggleFavoriteMealStatus(Meal meal){
+  }*/
+  /*void _toggleFavoriteMealStatus(Meal meal){
     final bool isExisting = _favoriteMeals.contains(meal);
     if(isExisting){
       setState(() {
@@ -41,20 +68,24 @@ class _TabsScreen extends State<TabsScreen>{
       });
       _showSnackBar('Added to Favorites');
     }
-  }
+  }*/
   @override
   Widget build(BuildContext context) {
-    Widget activeScreen =  CategoriesScreen(onToggleFavorite: _toggleFavoriteMealStatus);
+    //final meals = ref.watch(mealsProvider);
+    //final selectedFilters  = ref.watch(filtersProvider);
+    final filteredMeals = ref.watch(filteredMealsProvider);
+    final favoriteMeals = ref.watch(favoriteMealsProvider);
+    Widget activeScreen =  CategoriesScreen(availableMeals: filteredMeals);
     var activePageTitle = 'Categories';
     if(_selectedPageIndex == 1){
-      activeScreen = MealsScreen(meals: _favoriteMeals,onToggleFavorite: _toggleFavoriteMealStatus);
+      activeScreen = MealsScreen(meals: favoriteMeals);
       activePageTitle = 'Your Favorites';
     }
-    return Scaffold(
+    return Scaffold(  
       appBar: AppBar(
         title: Text(activePageTitle),
       ),
-      drawer: const MainDrawer(),
+      drawer: MainDrawer(onSelectScreen: _setScreen),
       body: activeScreen,
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedPageIndex,//to indicate which tab is shown

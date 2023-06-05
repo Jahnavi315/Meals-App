@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 
 class MainDrawer extends StatelessWidget{
-  const MainDrawer({super.key});
+  const MainDrawer({super.key,required this.onSelectScreen});
+  final void Function(String) onSelectScreen;
   @override
   Widget build(BuildContext context) {
     return Drawer(
       child: Column(
-        children: [DrawerHeader(
+        children: [
+          DrawerHeader(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -32,11 +34,43 @@ class MainDrawer extends StatelessWidget{
                   color: Theme.of(context).colorScheme.primary
                 ),
               ),
-              const ListTile( 
-
-              )
             ],
           )
+        ),
+        ListTile( 
+          leading: Icon(
+          Icons.restaurant,
+          size: 25,
+          color: Theme.of(context).colorScheme.onBackground,
+          ),
+          title: Text(
+            'Meals',
+            style: Theme.of(context).textTheme.titleSmall!.copyWith( 
+            color: Theme.of(context).colorScheme.onBackground,
+            fontSize: 25
+            )
+          ),
+          onTap: (){
+            onSelectScreen('Meals');
+            //using navigator push causes trouble!
+          },
+        ),
+        ListTile( 
+          leading: Icon(
+          Icons.settings,
+          size: 25,
+          color: Theme.of(context).colorScheme.onBackground,
+          ),
+          title: Text(
+            'Filters',
+            style: Theme.of(context).textTheme.titleSmall!.copyWith( 
+            color: Theme.of(context).colorScheme.onBackground,
+            fontSize: 25
+            )
+          ),
+          onTap: (){
+            onSelectScreen('Filters');
+          },
         ),
         ]
       ),

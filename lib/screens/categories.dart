@@ -5,19 +5,28 @@ import 'package:meals_app/screens/meals.dart';
 import 'package:meals_app/widgets/category_grid_item.dart';
 import 'package:meals_app/models/meal.dart';
 
-class CategoriesScreen extends StatelessWidget{
-  const CategoriesScreen({super.key,required this.onToggleFavorite});
-  final void Function(Meal) onToggleFavorite;
+class CategoriesScreen extends StatefulWidget{
+  const CategoriesScreen({super.key,required this.availableMeals});
+  final List<Meal> availableMeals;
 
-  void _selectCategory(BuildContext context,Category category){//this context is related to category grid item
-    final filteredMeals  =  dummyMeals.where((meal) => meal.categories.contains(category.id)).toList();
-    Navigator.of(context).push(MaterialPageRoute(builder: (cxt){
-      return MealsScreen(meals: filteredMeals, title: category.title,onToggleFavorite: onToggleFavorite);
+  @override
+  State<CategoriesScreen> createState() => _CategoriesScreenState();
+}
+
+class _CategoriesScreenState extends State<CategoriesScreen> {
+
+  void _selectCategory(BuildContext context,Category category){
+    //this context is related to category grid item
+    final filteredMeals  =  widget.availableMeals.where(
+      (meal) => meal.categories.contains(category.id)).toList();
+      Navigator.of(context).push(MaterialPageRoute(builder: (cxt){
+      return MealsScreen(meals: filteredMeals, title: category.title);
     }
     )
     );
     //Navigator.push(context, MaterialPageRoute(builder: builder))
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
